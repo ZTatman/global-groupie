@@ -1,23 +1,20 @@
-import logo from './logo.svg';
 import './App.css';
+import { Color } from "cesium";
+import { Viewer, Entity } from "resium";
+import { Cartesian3 } from "cesium";
+import { Ion } from "cesium";
 
+Ion.defaultAccessToken = process.env.REACT_APP_CESIUM_ION_ACCESS_TOKEN;
 function App() {
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <Viewer full>
+        <Entity
+          name="Test"
+          position={Cartesian3.fromDegrees(10, 10, 1000)}
+          point={{ pixelSize: 10, color: Color.RED }}
+        />
+      </Viewer>
     </div>
   );
 }
