@@ -3,7 +3,6 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@craco/craco": "^7.1.0",
     "cesium": "^1.126.0",
     "craco-cesium": "^1.2.0",
     "react": "^19.0.0",
@@ -12,9 +11,10 @@
     "resium": "^1.19.0-beta.1"
   },
   "scripts": {
-    "start": "craco start",
+    "start": "craco start --verbose",
     "build": "craco build",
-    "test": "craco test",
+    "test": "jasmine-browser-runner runSpecs",
+    "test:serve": "jasmine-browser-runner serve",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
@@ -35,6 +35,9 @@
     ]
   },
   "devDependencies": {
-    "copy-webpack-plugin": "^12.0.2"
+    "@craco/craco": "^7.1.0",
+    "copy-webpack-plugin": "^12.0.2",
+    "jasmine-browser-runner": "^3.0.0",
+    "jasmine-core": "^5.6.0"
   }
 }

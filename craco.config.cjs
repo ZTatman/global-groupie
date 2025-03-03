@@ -1,18 +1,20 @@
 const path = require('path');
-// import { fileURLToPath } from 'url';
 const CopyWebpackPlugin = require('copy-webpack-plugin');
-
-// const __filename = fileURLToPath(import.meta.url);
-// const __dirname = path.dirname(__filename);
+const CracoCesiumPlugin = require('craco-cesium');
 
 const cesiumSource = 'node_modules/cesium/Build/Cesium';
 const cesiumBaseUrl = 'static/cesium';
 
 module.exports = {
+    plugins: [
+        {
+            plugin: CracoCesiumPlugin()
+        }
+    ],
     webpack: {
-        // alias: {
-        //     cesium: path.resolve(__dirname, 'node_modules/@cesium/engine'),
-        // },
+        alias: {
+            cesium: path.resolve(__dirname, cesiumSource),
+        },
         plugins: {
             add: [
                 new CopyWebpackPlugin({
@@ -27,14 +29,16 @@ module.exports = {
         },
         configure: (webpackConfig) => {
             webpackConfig.output.sourcePrefix = '';
+            
             webpackConfig.resolve.fallback = {
                 ...webpackConfig.resolve.fallback,
                 fs: false,
                 http: false,
                 https: false,
-                zlib: false,
+                zlib: false
             };
+            
             return webpackConfig;
-        },
-    },
+        }
+    }
 };
