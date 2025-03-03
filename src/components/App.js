@@ -1,6 +1,6 @@
 // The URL on your server where CesiumJS's static files are hosted.
 import React from 'react';
-import './App.css';
+import '../App.css';
 import { Viewer, Entity } from 'resium';
 import { Cartesian3, Color, Ion } from 'cesium';
 
