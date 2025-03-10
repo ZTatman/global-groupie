@@ -4,6 +4,8 @@
   "private": true,
   "type": "module",
   "dependencies": {
+    "@tanstack/react-query": "^5.67.2",
+    "@tanstack/react-query-devtools": "^5.67.2",
     "cesium": "^1.126.0",
     "craco-cesium": "^1.2.0",
     "react": "^19.0.0",
@@ -17,12 +19,10 @@
     "pretest": "node spec/support/build-import-map.js",
     "test": "jasmine-browser-runner runSpecs --config=spec/support/jasmine-browser.js",
     "test:serve": "jasmine-browser-runner serve",
-    "eject": "react-scripts eject"
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app"
-    ]
+    "eject": "react-scripts eject",
+    "lint": "eslint .",
+    "format": "prettier --write \"**/*.{js,jsx,cjs,json,css,md}\"",
+    "format:check": "prettier --check \"**/*.{js,jsx,cjs,json,css,md}\""
   },
   "browserslist": {
     "production": [
@@ -41,9 +41,16 @@
     "@babel/preset-env": "^7.26.9",
     "@babel/preset-react": "^7.26.3",
     "@craco/craco": "^7.1.0",
+    "@tanstack/eslint-plugin-query": "^5.67.2",
     "@testing-library/react": "^16.2.0",
     "copy-webpack-plugin": "^12.0.2",
+    "eslint": "^8.57.1",
+    "eslint-config-prettier": "^10.1.1",
+    "eslint-plugin-prettier": "^5.2.3",
+    "eslint-plugin-react": "^7.37.4",
+    "eslint-plugin-react-hooks": "^5.2.0",
     "jasmine-browser-runner": "^3.0.0",
-    "jasmine-core": "^5.6.0"
+    "jasmine-core": "^5.6.0",
+    "prettier": "^3.5.3"
   }
 }

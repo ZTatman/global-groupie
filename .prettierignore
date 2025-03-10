@@ -1,0 +1,15 @@
+# Build artifacts
+build
+dist
+coverage
+
+# Package files
+node_modules
+package-lock.json
+yarn.lock
+
+# Generated files
+.eslintcache
+
+# Cesium files
+static/cesium 

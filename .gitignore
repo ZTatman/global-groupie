@@ -25,3 +25,13 @@ yarn-error.log*
 .env
 settings.json
 package-lock.json
+
+# ESLint
+.eslintcache
+
+# VSCode
+.vscode
+.vscode/settings.json
+
+# package-lock.json
+package-lock.json
