@@ -25,13 +25,13 @@ try {
 
   // Get installed React version
   let reactVersion, reactDomVersion, testingLibraryVersion;
-  
+
   try {
     if (!packageJson.dependencies.react) {
       throw new Error('React dependency not found in package.json');
     }
     reactVersion = packageJson.dependencies.react.replace('^', '');
-    
+
     if (!packageJson.dependencies['react-dom']) {
       throw new Error('react-dom dependency not found in package.json');
     }
@@ -51,10 +51,12 @@ try {
   const jasmineBrowserPath = path.resolve(__dirname, 'jasmine-browser.js');
 
   let jasmineBrowserContent;
-  
+
   try {
     if (!fs.existsSync(jasmineBrowserPath)) {
-      throw new Error(`❌ File not found: ${jasmineBrowserPath}, please create a jasmine-browser.js file in the spec/support directory using the 'npx jasmine-browser-runner init' command.`);
+      throw new Error(
+        `❌ File not found: ${jasmineBrowserPath}, please create a jasmine-browser.js file in the spec/support directory using the 'npx jasmine-browser-runner init' command.`
+      );
     }
     jasmineBrowserContent = fs.readFileSync(jasmineBrowserPath, 'utf8');
   } catch (err) {
@@ -74,15 +76,15 @@ try {
 
   // Replace existing import map section with regex
   const IMPORT_MAP_REGEX = /\s\simportMap:\s*{[\s\S]*?},/m;
-  
+
   if (!IMPORT_MAP_REGEX.test(jasmineBrowserContent)) {
     console.error('❌ Could not find importMap section in jasmine-browser.js');
     console.error('   Make sure the file has an importMap configuration.');
     process.exit(1);
   }
-  
+
   const updatedContent = jasmineBrowserContent.replace(IMPORT_MAP_REGEX, IMPORT_MAP_SECTION);
-  
+
   // Write back to file
   try {
     fs.writeFileSync(jasmineBrowserPath, updatedContent);
@@ -98,4 +100,4 @@ try {
 } catch (err) {
   console.error('❌ Unexpected error:', err.message);
   process.exit(1);
-} 
+}
