@@ -1,11 +1,11 @@
 // To rebuild the import map, run the 'npm run pretest' command
 export default {
-  srcDir: 'src',
+  srcDir: "src",
   srcFiles: [],
-  specDir: 'spec',
-  specFiles: ['**/*.spec.js'],
-  helpers: ['support/test-helpers.js'],
-  esmFilenameExtension: '.js',
+  specDir: "spec",
+  specFiles: ["**/*.spec.js"],
+  helpers: ["support/test-helpers.js"],
+  esmFilenameExtension: ".js",
   modulesWithSideEffectsInSrcFiles: false,
   enableTopLevelAwait: true,
   env: {
@@ -19,25 +19,25 @@ export default {
   // To rebuild the import map, run the 'npm run pretest' command
   importMap: {
     imports: {
-      react: 'https://esm.sh/react@19.0.0',
-      'react-dom': 'https://esm.sh/react-dom@19.0.0',
-      'react-dom/client': 'https://esm.sh/react-dom@19.0.0/client',
-      '@testing-library/react': 'https://esm.sh/@testing-library/react@16.2.0',
+      react: "https://esm.sh/react@19.0.0",
+      "react-dom": "https://esm.sh/react-dom@19.0.0",
+      "react-dom/client": "https://esm.sh/react-dom@19.0.0/client",
+      "@testing-library/react": "https://esm.sh/@testing-library/react@16.2.0",
     },
   },
-  listenAddress: 'localhost',
-  hostname: 'localhost',
+  listenAddress: "localhost",
+  hostname: "localhost",
   browser: {
-    name: 'chrome',
+    name: "chrome",
   },
   babel: {
     plugins: [],
     presets: [
-      ['@babel/preset-env', { targets: { browsers: ['chrome', 'firefox', 'edge', 'safari'] } }],
+      ["@babel/preset-env", { targets: { browsers: ["chrome", "firefox", "edge", "safari"] } }],
       [
-        '@babel/preset-react',
+        "@babel/preset-react",
         {
-          runtime: 'automatic',
+          runtime: "automatic",
           development: true,
           throwIfNamespace: false,
         },

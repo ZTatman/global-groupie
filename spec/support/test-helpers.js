@@ -1,8 +1,8 @@
 // This file gets loaded as a helper in all specs
 // Import React and make it available globally
-import React from 'react';
-import * as ReactDOM from 'react-dom';
-import { createRoot } from 'react-dom/client';
+import React from "react";
+import * as ReactDOM from "react-dom";
+import { createRoot } from "react-dom/client";
 
 // Make React available globally so tests don't need to import it
 window.React = React;

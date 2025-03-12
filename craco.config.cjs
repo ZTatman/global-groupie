@@ -1,9 +1,9 @@
-const path = require('path');
-const CopyWebpackPlugin = require('copy-webpack-plugin');
-const CracoCesiumPlugin = require('craco-cesium');
+const path = require("path");
+const CopyWebpackPlugin = require("copy-webpack-plugin");
+const CracoCesiumPlugin = require("craco-cesium");
 
-const cesiumSource = 'node_modules/cesium/Build/Cesium';
-const cesiumBaseUrl = 'static/cesium';
+const cesiumSource = "node_modules/cesium/Build/Cesium";
+const cesiumBaseUrl = "static/cesium";
 
 module.exports = {
   plugins: [
@@ -14,36 +14,34 @@ module.exports = {
   // Simplified ESLint configuration
   eslint: {
     enable: true,
-    // Use the new flat config format
-    useEslintrc: false,
-    // We'll manually run eslint using our npm script
-    mode: 'extends',
+    // Use the ESLint config file
+    useEslintrc: true,
   },
   webpack: {
     alias: {
       cesium: path.resolve(__dirname, cesiumSource),
-      '@': path.resolve(__dirname, './src'), // Add the '@' alias for src
-      '@components': path.resolve(__dirname, './src/components'),
-      '@spec': path.resolve(__dirname, './spec'),
+      "@": path.resolve(__dirname, "./src"), // Add the '@' alias for src
+      "@components": path.resolve(__dirname, "./src/components"),
+      "@spec": path.resolve(__dirname, "./spec"),
     },
     plugins: {
       add: [
         new CopyWebpackPlugin({
           patterns: [
             {
-              from: path.join(cesiumSource, 'Workers'),
+              from: path.join(cesiumSource, "Workers"),
               to: `${cesiumBaseUrl}/Workers`,
             },
             {
-              from: path.join(cesiumSource, 'ThirdParty'),
+              from: path.join(cesiumSource, "ThirdParty"),
               to: `${cesiumBaseUrl}/ThirdParty`,
             },
             {
-              from: path.join(cesiumSource, 'Assets'),
+              from: path.join(cesiumSource, "Assets"),
               to: `${cesiumBaseUrl}/Assets`,
             },
             {
-              from: path.join(cesiumSource, 'Widgets'),
+              from: path.join(cesiumSource, "Widgets"),
               to: `${cesiumBaseUrl}/Widgets`,
             },
           ],
@@ -51,7 +49,7 @@ module.exports = {
       ],
     },
     configure: (webpackConfig) => {
-      webpackConfig.output.sourcePrefix = '';
+      webpackConfig.output.sourcePrefix = "";
 
       webpackConfig.resolve.fallback = {
         ...webpackConfig.resolve.fallback,
