@@ -11,11 +11,11 @@ window.createRoot = createRoot;
 
 // Add any other test setup here
 beforeEach(() => {
-  // This function runs before each test
-  // You can set up common test environment here
+    // This function runs before each test
+    // You can set up common test environment here
 });
 
 afterEach(() => {
-  // This function runs after each test
-  // You can clean up common test environment here
+    // This function runs after each test
+    // You can clean up common test environment here
 });
