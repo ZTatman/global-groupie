@@ -3,11 +3,18 @@ import { useQuery } from "@tanstack/react-query";
 import Cesium from "cesium";
 import React from "react";
 import * as Resium from "resium";
+import { AircraftCategory, PositionSource, OpenSkyPropertiesByIndex } from "@/utils/enums";
+import { getColorForPlane, getAirplaneIconWithAltitudeColor } from "@/utils/functions";
+// Set your Ion access token
+Cesium.Ion.defaultAccessToken = process.env.REACT_APP_CESIUM_ION_ACCESS_TOKEN || "your-default-token-here";
 
-const svgIcons = Object.freeze({
-    POINT: "data:image/svg+xml;base64,PHN2ZyBoZWlnaHQ9IjY0IiB3aWR0aD0iNjQiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgdmlld0JveD0iMCAwIDUxMiA1MTIiIHhtbDpzcGFjZT0icHJlc2VydmUiIHN0cm9rZT0iIzAwMCIgdHJhbnNmb3JtPSJyb3RhdGUoMjcwKSI+PGcgc3Ryb2tlLXdpZHRoPSIwIi8+PGcgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBhdGggZD0iTTQ5MC43IDBjLTIxLjMgMC00Mi43IDAtNTMuMyAxMC43bC04NS4zIDk2SDIxLjNMMCAxMzguN2wyMzQuNyA3NC43LTY0IDg1LjNoLTk2bC0zMiAzMiA2NCAyMS4zdjMyYy43IDExLjUgMTAuNyAyMS4zIDIxLjMgMjEuM2gzMmwyMS4zIDY0IDMyLTMydi05Nmw4NS4zLTY0TDM3My4zIDUxMmwzMi0yMS4zVjE2MGw5Ni04NS4zQzUxMiA2NCA1MTIgNDIuNyA1MTIgMjEuMyA1MTIgMTAuNyA1MDEuMyAwIDQ5MC43IDB6Ii8+PC9zdmc+",
-    AIRPLANE:
-        "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHZpZXdCb3g9IjAgMCAxNiAxNiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNMTIuMyA2LjVjLjUtLjUuOS0uOCAxLjItMS4xIDEuNi0xLjYgMy4yLTQuMSAyLjItNS4xcy0zLjQuNi01IDIuMmMtLjMuMy0uNi43LTEuMSAxLjJMMi42LjVDMS45LjIgMS4xLjMuNi44bC0uNi41TDYuNiA3Yy0xLjMgMS42LTIuNyAzLjEtMy40IDRsLTEuMS0uNmMtLjUtLjMtMS4yLS4zLTEuNi4ybC0uMy4zTDMgMTNsMiAyLjguMy0uM2MuNC0uNC41LTEuMS4yLTEuNkw1IDEyLjhjLjktLjcgMi40LTIuMSA0LTMuNGw1LjcgNi42LjUtLjVjLjUtLjUuNi0xLjMuMy0yeiIvPjwvc3ZnPg==",
+const BoundingBox = Object.freeze({
+    US: {
+        lamin: 24.5,
+        lomin: -124.8,
+        lamax: 49.5,
+        lomax: -66.9,
+    },
 });
 
 function LoadingScreen() {
@@ -21,17 +28,6 @@ function LoadingScreen() {
         </div>
     );
 }
-
-function getColorForPlane(state) {
-    const altitude = state[7] || 0;
-    if (altitude > 10000) return Cesium.Color.RED;
-    if (altitude > 5000) return Cesium.Color.ORANGE;
-    if (altitude > 2000) return Cesium.Color.YELLOW;
-    return Cesium.Color.GREEN;
-}
-
-// Set your Ion access token
-Cesium.Ion.defaultAccessToken = process.env.REACT_APP_CESIUM_ION_ACCESS_TOKEN || "your-default-token-here";
 
 function App() {
     const [viewer, setViewer] = React.useState(null);
@@ -47,7 +43,9 @@ function App() {
         queryKey: ["planes"],
         queryFn: async () => {
             try {
-                const response = await fetch("https://opensky-network.org/api/states/all?lamin=24.5&lomin=-124.8&lamax=49.5&lomax=-66.9");
+                const response = await fetch(
+                    `https://opensky-network.org/api/states/all?lamin=${BoundingBox.US.lamin}&lomin=${BoundingBox.US.lomin}&lamax=${BoundingBox.US.lamax}&lomax=${BoundingBox.US.lomax}`
+                );
                 if (!response.ok) {
                     const errorMessages = {
                         400: "Invalid request",
@@ -72,23 +70,43 @@ function App() {
         retry: 3,
     });
 
-    const handleReady = React.useCallback(
-        (tileset) => {
-            if (!viewer) return;
-            // Fly to the USA (continental US bounds)
-            viewer.camera.flyTo({
-                destination: Cesium.Rectangle.fromDegrees(-124.8, 24.5, -66.9, 49.5),
-                duration: 3,
-            });
-        },
-        [viewer]
-    );
+    const convertedPlanes = React.useMemo(() => {
+        const _convertedPlanes = Object.assign({}, planes, {
+            time: planes?.time,
+            states: planes?.states?.map((stateVector) => {
+                const stateObject = {};
+                stateVector.forEach((value, index) => {
+                    stateObject[OpenSkyPropertiesByIndex[index]] = value;
+                });
+                return Object.freeze({
+                    ...stateObject,
+                    imageUri: getAirplaneIconWithAltitudeColor(stateObject.geo_altitude),
+                    color: getColorForPlane(stateObject.geo_altitude),
+                });
+            }),
+        });
+        return _convertedPlanes;
+    }, [planes]);
 
     const setViewerRef = React.useCallback((viewerInstance) => {
         if (viewerInstance && viewerInstance.cesiumElement) {
             setViewer(viewerInstance.cesiumElement);
         }
     }, []);
+
+    const handleReady = React.useCallback((tileset) => {
+        if (!tileset) return;
+        setDataSource(tileset);
+    }, []);
+
+    React.useEffect(() => {
+        if (!viewer) return;
+        // Fly to the USA (continental US bounds)
+        viewer.camera.flyTo({
+            destination: Cesium.Rectangle.fromDegrees(-124.8, 24.5, -66.9, 49.5),
+            duration: 3,
+        });
+    }, [viewer]);
 
     React.useEffect(() => {
         async function loadTerrain() {
@@ -106,7 +124,6 @@ function App() {
     }, []);
 
     const isLoading = isCesiumLoading || isPending;
-
     return (
         <div className="App">
             {isLoading && <LoadingScreen />}
@@ -118,21 +135,71 @@ function App() {
                 baseLayerPicker={false}
                 ref={setViewerRef}>
                 <Resium.Cesium3DTileset url={Cesium.IonResource.fromAssetId(96188)} onReady={handleReady} />
-                {planes &&
-                    planes.states.map((state) => (
+                {!isLoading &&
+                    convertedPlanes?.states.map((vector) => (
                         <Resium.Entity
-                            key={state[0]}
-                            name={state[1]}
-                            position={Cesium.Cartesian3.fromDegrees(state[5], state[6], 1000)}
-                            point={{
-                                pixelSize: 4.0,
-                                color: getColorForPlane(state),
-                                outlineColor: Cesium.Color.BLACK,
-                                outlineWidth: 0.5,
-                                scaleByDistance: new Cesium.NearFarScalar(10e3, 4.0, 10e6, 0.0),
-                            }}
-                            description={`${state[1]} - (${state[2]})`}
-                        />
+                            key={vector.icao24}
+                            name={vector.callsign}
+                            position={Cesium.Cartesian3.fromDegrees(vector.longitude, vector.latitude, 1000)}
+                            onClick={(e) => {
+                                const cameraPosition = viewer.camera.positionCartographic;
+
+                                viewer.camera.flyTo({
+                                    destination: Cesium.Cartesian3.fromDegrees(vector.longitude, vector.latitude, cameraPosition.height),
+                                    duration: 1.5,
+                                });
+                            }}>
+                            <Resium.BillboardGraphics image={vector.imageUri} scale={0.5} verticalOrigin={Cesium.VerticalOrigin.BOTTOM} />
+                            <Resium.EntityDescription>
+                                <div className="entity-description">
+                                    <h2>Aircraft: {vector.callsign}</h2>
+                                    <table className="info-table">
+                                        <tbody>
+                                            <tr>
+                                                <td>Callsign:</td>
+                                                <td>{vector.callsign}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Aircraft Category:</td>
+                                                <td>{AircraftCategory[vector.category]}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Origin Country:</td>
+                                                <td>{vector.origin_country}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Coordinates:</td>
+                                                <td>{`Longitude: ${vector.longitude}, Latitude: ${vector.latitude}`}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Barometric Altitude:</td>
+                                                <td>{vector.baro_altitude} meters</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Geometric Altitude:</td>
+                                                <td>{vector.geo_altitude} meters</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Velocity:</td>
+                                                <td>{vector.velocity} m/s</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Position Source:</td>
+                                                <td>{PositionSource[vector.position_source]}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <div className="description-footer">
+                                        <p className="data-citation">
+                                            Data provided by{" "}
+                                            <a href="https://opensky-network.org" target="_blank" rel="noopener noreferrer">
+                                                The OpenSky Network
+                                            </a>
+                                        </p>
+                                    </div>
+                                </div>
+                            </Resium.EntityDescription>
+                        </Resium.Entity>
                     ))}
             </Resium.Viewer>
         </div>
