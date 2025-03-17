@@ -32,7 +32,8 @@ function LoadingScreen() {
 function App() {
     const [viewer, setViewer] = React.useState(null);
     const [terrainProvider, setTerrainProvider] = React.useState(null);
-    const isCesiumLoading = !viewer || !terrainProvider;
+    const [tileset, setTileset] = React.useState(null);
+    const isCesiumLoading = !viewer || !terrainProvider || !tileset;
 
     const {
         isPending,
@@ -42,32 +43,36 @@ function App() {
     } = useQuery({
         queryKey: ["planes"],
         queryFn: async () => {
+            const errorMessages = {
+                400: "Invalid request",
+                404: "Not found",
+                429: "Rate limit exceeded",
+                500: "Internal server error",
+                502: "Bad gateway",
+                503: "Service unavailable",
+                504: "Gateway timeout",
+            };
             try {
                 const response = await fetch(
-                    `https://opensky-network.org/api/states/all?lamin=${BoundingBox.US.lamin}&lomin=${BoundingBox.US.lomin}&lamax=${BoundingBox.US.lamax}&lomax=${BoundingBox.US.lomax}`
+                    `https://opensky-network.org/api/states/all?lamin=${BoundingBox.US.lamin}&lomin=${BoundingBox.US.lomin}&lamax=${BoundingBox.US.lamax}&lomax=${BoundingBox.US.lomax}`,
+                    {
+                        // mode: "no-cors",
+                    }
                 );
                 if (!response.ok) {
-                    const errorMessages = {
-                        400: "Invalid request",
-                        404: "Not found",
-                        429: "Rate limit exceeded",
-                        500: "Internal server error",
-                        502: "Bad gateway",
-                        503: "Service unavailable",
-                        504: "Gateway timeout",
-                    };
                     const message = errorMessages[response.status] || `Response status: ${response.status}`;
                     throw new Error(message);
                 }
                 return await response.json();
             } catch (e) {
-                console.error(":: Error Message: ", e.message);
+                console.error(`:: Error Message: ${e.message}`);
                 return null;
             }
         },
-        enabled: !isCesiumLoading, // Only fetch when viewer and terrain are loaded
+        enabled: !isCesiumLoading, // Only fetch when viewer, terrain, and tileset are loaded.
         refetchInterval: 30_000,
         retry: 3,
+        refetchOnWindowFocus: false,
     });
 
     const convertedPlanes = React.useMemo(() => {
@@ -94,9 +99,9 @@ function App() {
         }
     }, []);
 
-    const handleReady = React.useCallback((tileset) => {
+    const handleTilesetReady = React.useCallback((tileset) => {
         if (!tileset) return;
-        setDataSource(tileset);
+        setTileset(tileset);
     }, []);
 
     React.useEffect(() => {
@@ -134,16 +139,17 @@ function App() {
                 timeline={false}
                 baseLayerPicker={false}
                 ref={setViewerRef}>
-                <Resium.Cesium3DTileset url={Cesium.IonResource.fromAssetId(96188)} onReady={handleReady} />
+                <Resium.Cesium3DTileset url={Cesium.IonResource.fromAssetId(96188)} onReady={handleTilesetReady} />
                 {!isLoading &&
-                    convertedPlanes?.states.map((vector) => (
+                    convertedPlanes?.states &&
+                    convertedPlanes.states.map((vector) => (
                         <Resium.Entity
                             key={vector.icao24}
                             name={vector.callsign}
                             position={Cesium.Cartesian3.fromDegrees(vector.longitude, vector.latitude, 1000)}
                             onClick={(e) => {
                                 const cameraPosition = viewer.camera.positionCartographic;
-
+                                // fly to the aircraft, keep the camera height the same.
                                 viewer.camera.flyTo({
                                     destination: Cesium.Cartesian3.fromDegrees(vector.longitude, vector.latitude, cameraPosition.height),
                                     duration: 1.5,

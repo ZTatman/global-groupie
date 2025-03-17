@@ -31,7 +31,7 @@ function cesiumColorToHexByAltitude(altitude) {
 }
 
 /**
- * Get the airplane icon with the altitude color
+ * Get the airplane icon svg data uri with the altitude color
  * @param {number} altitude - The altitude of the airplane
  * @returns {string} - The airplane icon with the altitude color
  */
