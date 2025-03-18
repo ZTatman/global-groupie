@@ -1,4 +1,4 @@
-import { AirplaneAltitudeColors, SvgIcons } from "@/utils/enums";
+import { AirplaneAltitudeColors, SvgIcons, AltitudeRanges } from "@/utils/enums";
 
 /**
  * Get the color for the airplane icon based on the altitude
@@ -6,17 +6,17 @@ import { AirplaneAltitudeColors, SvgIcons } from "@/utils/enums";
  * @returns {Cesium.Color} - The color for the airplane icon
  */
 function getColorForPlane(altitude) {
-    if (!altitude) return AirplaneAltitudeColors.DEFAULT;
+    if (!altitude) return AirplaneAltitudeColors.GROUND;
 
     switch (true) {
-        case altitude > 10000:
+        case altitude > AltitudeRanges.HIGH:
             return AirplaneAltitudeColors.HIGH;
-        case altitude > 5000:
+        case altitude > AltitudeRanges.MEDIUM:
             return AirplaneAltitudeColors.MEDIUM;
-        case altitude > 2000:
+        case altitude > AltitudeRanges.LOW:
             return AirplaneAltitudeColors.LOW;
         default:
-            return AirplaneAltitudeColors.DEFAULT;
+            return AirplaneAltitudeColors.GROUND;
     }
 }
 

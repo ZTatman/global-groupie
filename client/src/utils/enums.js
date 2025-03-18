@@ -1,3 +1,5 @@
+import Cesium from "cesium";
+
 const AircraftCategory = Object.freeze([
     "No information",
     "No ADS-B Emitter Category Information",
@@ -66,11 +68,18 @@ const OpenSkyPropertiesByIndex = Object.freeze({
 
 const PositionSource = Object.freeze(["ADS-B", "ASTERIX", "MLAT", "FLARM"]);
 
+const AltitudeRanges = Object.freeze({
+    GROUND: 0,
+    LOW: 2000,
+    MEDIUM: 5000,
+    HIGH: 10000,
+});
+
 const AirplaneAltitudeColors = Object.freeze({
-    DEFAULT: Cesium.Color.GREEN,
-    HIGH: Cesium.Color.RED,
-    MEDIUM: Cesium.Color.ORANGE,
+    GROUND: Cesium.Color.GREEN,
     LOW: Cesium.Color.YELLOW,
+    MEDIUM: Cesium.Color.ORANGE,
+    HIGH: Cesium.Color.RED,
 });
 
 const SvgIcons = Object.freeze({
@@ -79,4 +88,12 @@ const SvgIcons = Object.freeze({
         "PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0Ij48cGF0aCBzdHlsZT0iZmlsbDojZmZmIiBkPSJNMi4wNTguNDQxYy0uMTE0LS4yMjMtLjE3OS0uMjAzLS4xNDQuMDQ1TDUuMzIgMjMuODUyYS40NjcuNDY3IDAgMCAwIC42NDguMDMzbDUuMzY0LTQuNzM4YS42MS42MSAwIDAgMCAuMTMyLS43MDR6bTIwLjAwOCAxMy4xOTVMMi43MzEuMDgyYy0uMjA2LS4xNDItLjI1NC0uMDk1LS4xMDYuMTA5bDExLjg0NyAxNi41YS42MS42MSAwIDAgMCAuNjg4LjE5OGw2LjY0NS0yLjY1OWEuNDY3LjQ2NyAwIDAgMCAuMjYzLS41OTNNMy43OTcgMi42MjdjLS4xMjEtLjE3My0uMTM5LS4xNjItLjA0LjAyNGw3Ljk2NSAxNC43OTFjLjEuMTg1LjE2OC4xNjYuMTUxLS4wNDRsLS4xMS0xLjM4M2MtLjAxNy0uMjEuMTI1LS4zMDguMzE2LS4yMTdsMS4xNTYuNTQ1Yy4xOTEuMDkuMjQ4LjAyMi4xMjctLjE1eiIvPjwvc3ZnPg==",
 });
 
-export { AircraftCategory, OpenSkyAllProperties, OpenSkyPropertiesByIndex, PositionSource, AirplaneAltitudeColors, SvgIcons };
+export {
+    AircraftCategory,
+    OpenSkyAllProperties,
+    OpenSkyPropertiesByIndex,
+    PositionSource,
+    AirplaneAltitudeColors,
+    SvgIcons,
+    AltitudeRanges,
+};
